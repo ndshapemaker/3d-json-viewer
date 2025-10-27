@@ -15,6 +15,11 @@
         },
         {
             "type": "line",
+            "position": [
+                0,
+                0,
+                0
+            ],
             "points": [
                 [
                     -2,
@@ -27,6 +32,11 @@
                     0
                 ]
             ],
+            "rotation": [
+                0,
+                0,
+                45
+            ],
             "color": [
                 0,
                 1,
@@ -35,32 +45,32 @@
         },
         {
             "type": "polyline",
+            "position": [
+                0,
+                0,
+                0
+            ],
             "points": [
                 [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    1,
-                    1,
-                    0
-                ],
-                [
-                    2,
-                    0,
-                    0
-                ],
-                [
-                    1,
                     -1,
+                    0,
                     0
                 ],
                 [
                     0,
+                    1,
+                    0
+                ],
+                [
+                    1,
                     0,
                     0
                 ]
+            ],
+            "rotation": [
+                0,
+                45,
+                0
             ],
             "color": [
                 0,
@@ -70,7 +80,7 @@
         },
         {
             "type": "circle",
-            "center": [
+            "position": [
                 0,
                 0,
                 2
@@ -81,6 +91,11 @@
                 0,
                 1
             ],
+            "rotation": [
+                90,
+                0,
+                0
+            ],
             "color": [
                 1,
                 1,
@@ -89,7 +104,7 @@
         },
         {
             "type": "box",
-            "center": [
+            "position": [
                 -3,
                 1,
                 0
@@ -99,6 +114,11 @@
                 2,
                 1
             ],
+            "rotation": [
+                0,
+                30,
+                0
+            ],
             "color": [
                 1,
                 0,
@@ -107,12 +127,17 @@
         },
         {
             "type": "sphere",
-            "center": [
+            "position": [
                 3,
                 1,
                 0
             ],
             "radius": 1.2,
+            "rotation": [
+                45,
+                0,
+                0
+            ],
             "color": [
                 0,
                 1,
@@ -121,17 +146,22 @@
         },
         {
             "type": "pyramid",
+            "position": [
+                0,
+                0,
+                0
+            ],
             "apex": [
                 0,
                 3,
                 0
             ],
-            "baseCenter": [
+            "baseRadius": 2,
+            "rotation": [
                 0,
-                0,
+                45,
                 0
             ],
-            "baseRadius": 2,
             "color": [
                 1,
                 0.5,

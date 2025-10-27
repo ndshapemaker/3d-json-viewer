@@ -25,12 +25,17 @@ Live demo: [https://your-username.github.io/3d-json-viewer](https://your-usernam
 
 ---
 
-## JSON Format
+## JSON Format (with `position` + `rotation`)
 
 ```json
 {
   "primitives": [
-    { "type": "box", "center": [0,0,0], "size": [2,2,2], "color": [1,0,0] },
-    { "type": "sphere", "center": [3,0,0], "radius": 1, "color": [0,1,0] }
+    {
+      "type": "box",
+      "position": [0, 0, 0],
+      "size": [2, 1, 1],
+      "rotation": [0, 45, 0],
+      "color": [1, 0, 0]
+    }
   ]
 }

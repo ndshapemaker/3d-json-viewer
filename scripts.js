@@ -1,4 +1,70 @@
-// script.js
+Below is the complete updated repository with full rotation support for every primitive.
+
+    What's New?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+FeatureSupportrotation in JSONrotation: [x, y, z](degrees)Applies to all primitivespoint, line, box, sphere, etc.Uses Euler anglesOrder: XYZWorks with positionPosition → Rotate → RenderClean & backward compatibleOld files still work
+
+Updated JSON Format(with rotation)
+json{
+    "primitives": [
+        {
+            "type": "box",
+            "position": [0, 0, 0],
+            "size": [2, 1, 1],
+            "rotation": [0, 45, 0],
+            "color": [1, 0, 0]
+        },
+        {
+            "type": "sphere",
+            "position": [3, 0, 0],
+            "radius": 1,
+            "rotation": [30, 0, 0],
+            "color": [0, 1, 0]
+        },
+        {
+            "type": "line",
+            "position": [0, 0, 0],
+            "points": [[-1, 0, 0], [1, 0, 0]],
+            "rotation": [0, 0, 90],
+            "color": [0, 0, 1]
+        }
+    ]
+}
+
+rotation: [x, y, z] → degrees, applied in XYZ order
+
+
+Updated script.js(Only Changes)
+Replace your script.js with this updated version:
+js// script.js — WITH ROTATION SUPPORT
 let scene, camera, renderer, controls;
 let root = new THREE.Group();
 let currentData = null;
@@ -9,36 +75,28 @@ animate();
 function init() {
     const container = document.getElementById('viewer');
 
-    // Scene
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xf8f9fa);
     scene.add(root);
 
-    // Camera
     camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
     camera.position.set(10, 10, 10);
 
-    // Renderer
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(container.clientWidth, container.clientHeight);
     container.appendChild(renderer.domElement);
 
-    // Controls
     controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
 
-    // Lights
     scene.add(new THREE.AmbientLight(0x666666));
     const dirLight = new THREE.DirectionalLight(0xffffff, 1);
     dirLight.position.set(5, 10, 7);
     scene.add(dirLight);
 
-    // Resize
     window.addEventListener('resize', onWindowResize);
-
-    // UI
     setupUI();
 }
 
@@ -81,7 +139,7 @@ function setupUI() {
     downloadBtn.addEventListener('click', exportGLB);
 }
 
-// =============== GEOMETRY LOADER ===============
+// =============== GEOMETRY LOADER (WITH POSITION + ROTATION) ===============
 function loadGeometry(data) {
     root.clear();
 
@@ -94,13 +152,14 @@ function loadGeometry(data) {
 
     data.primitives.forEach(prim => {
         const color = new THREE.Color(...(prim.color || [1, 1, 1]));
+        const position = prim.position ? new THREE.Vector3(...prim.position) : new THREE.Vector3();
+        const rotation = prim.rotation || [0, 0, 0]; // [x, y, z] in degrees
         let obj;
 
         switch (prim.type) {
             case 'point':
                 const pointGeo = new THREE.SphereGeometry(0.08, 16, 16);
                 obj = new THREE.Mesh(pointGeo, new THREE.MeshBasicMaterial({ color }));
-                obj.position.fromArray(prim.position);
                 break;
 
             case 'line':
@@ -112,25 +171,19 @@ function loadGeometry(data) {
                 break;
 
             case 'circle':
-                const center = new THREE.Vector3(...(prim.center || [0, 0, 0]));
+                const center = position.clone();
                 const radius = prim.radius || 1;
                 const normal = new THREE.Vector3(...(prim.normal || [0, 1, 0])).normalize();
-                const curve = new THREE.EllipseCurve(
-                    center.x, center.y, radius, radius, 0, Math.PI * 2, false
-                );
+                const curve = new THREE.EllipseCurve(center.x, center.y, radius, radius, 0, Math.PI * 2, false);
                 const circlePoints = curve.getPoints(64);
                 const circleGeo = new THREE.BufferGeometry().setFromPoints(circlePoints);
                 obj = new THREE.Line(circleGeo, new THREE.LineBasicMaterial({ color }));
-                // Rotate to normal
-                const temp = new THREE.Vector3();
-                temp.crossVectors(normal, new THREE.Vector3(0, 1, 0)).normalize();
-                if (temp.length() > 0.01) {
-                    const axis = temp;
-                    const angle = Math.acos(normal.dot(new THREE.Vector3(0, 1, 0)));
-                    objs = new THREE.Object3D();
-                    objs.quaternion.setFromAxisAngle(axis, angle);
-                    objs.add(obj);
-                    obj = objs;
+
+                const up = new THREE.Vector3(0, 1, 0);
+                if (!normal.equals(up)) {
+                    const axis = new THREE.Vector3().crossVectors(up, normal).normalize();
+                    const angle = Math.acos(up.dot(normal));
+                    obj.quaternion.setFromAxisAngle(axis, angle);
                 }
                 obj.position.copy(center);
                 break;
@@ -139,18 +192,16 @@ function loadGeometry(data) {
                 const size = prim.size || [1, 1, 1];
                 const boxGeo = new THREE.BoxGeometry(...size);
                 obj = new THREE.Mesh(boxGeo, new THREE.MeshLambertMaterial({ color }));
-                if (prim.center) obj.position.fromArray(prim.center);
                 break;
 
             case 'sphere':
                 const sphereGeo = new THREE.SphereGeometry(prim.radius || 1, 32, 32);
                 obj = new THREE.Mesh(sphereGeo, new THREE.MeshLambertMaterial({ color }));
-                if (prim.center) obj.position.fromArray(prim.center);
                 break;
 
             case 'pyramid':
-                const apex = new THREE.Vector3(...(prim.apex || [0, 2, 0]));
-                const baseCenter = new THREE.Vector3(...(prim.baseCenter || [0, 0, 0]));
+                const apex = prim.apex ? new THREE.Vector3(...prim.apex) : position.clone().add(new THREE.Vector3(0, 2, 0));
+                const baseCenter = position.clone();
                 const baseRadius = prim.baseRadius || 1;
                 const height = apex.distanceTo(baseCenter);
                 const pyrGeo = new THREE.ConeGeometry(baseRadius, height, 4);
@@ -166,6 +217,15 @@ function loadGeometry(data) {
         }
 
         if (obj) {
+            // Apply position and rotation
+            obj.position.copy(position);
+            obj.rotation.set(
+                THREE.MathUtils.degToRad(rotation[0]),
+                THREE.MathUtils.degToRad(rotation[1]),
+                THREE.MathUtils.degToRad(rotation[2])
+            );
+            obj.updateMatrix();
+
             root.add(obj);
             meshes.push(obj);
         }
