@@ -1,7 +1,7 @@
-// script.js — FIXED WITH MODERN IMPORTS (r167+)
+// script.js — FIXED 404 IMPORTS (r167 Compatible)
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.167.1/build/three.module.js';
-import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.167.1/examples/jsm/controls/OrbitControls.js';
-import { GLTFExporter } from 'https://cdn.jsdelivr.net/npm/three@0.167.1/examples/jsm/exporters/GLTFExporter.js';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.167.1/examples/jsm/OrbitControls.js';
+import { GLTFExporter } from 'https://cdn.jsdelivr.net/npm/three@0.167.1/examples/jsm/GLTFExporter.js';
 
 let scene, camera, renderer, controls;
 let root = new THREE.Group();
@@ -132,7 +132,7 @@ function loadGeometry(data) {
                     circlePoints.push(new THREE.Vector3(Math.cos(angle) * radius, Math.sin(angle) * radius, 0));
                 }
                 obj = new THREE.Line(new THREE.BufferGeometry().setFromPoints(circlePoints), new THREE.LineBasicMaterial({ color }));
-                // Align to normal
+                // Align to normal (XZ plane by default, rotate to match normal)
                 obj.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
                 obj.position.copy(center);
                 break;
